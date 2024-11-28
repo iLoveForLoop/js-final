@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="home.css" />
+    <style>
+      .hide {
+        display: none;
+      }
+
+      .size {
+        font-size: 80px;
+      }
+
+      .size-2 {
+        font-size: 50px;
+      }
+
+      .hidePop {
+        opacity: 0;
+        transition: opacity 0.4s ease-in-out;
+      }
+
+      .visible-element {
+        opacity: 1;
+        transition: opacity 0.4s ease-in-out;
+        pointer-events: auto;
+      }
+
+      i {
+        cursor: pointer !important;
+      }
+
+      .containerT {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        padding: 2rem;
+      }
+
+      .cardT {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        text-align: center;
+        padding: 1.5rem;
+        transition: transform 0.3s, box-shadow 0.3s;
+        cursor: pointer;
+      }
+
+      .cardT:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 12px 20px rgba(0, 0, 0, 0.3);
+      }
+
+      .cardT img {
+        width: 120px;
+        height: 120px;
+        margin-bottom: 1rem;
+        border-radius: 50%;
+        border: 2px solid #ff6f61;
+      }
+
+      .cardT h2 {
+        font-size: 1.5rem;
+        margin: 0.5rem 0;
+        color: #ffd700;
+      }
+
+      .cardT p {
+        font-size: 1rem;
+        margin: 0.5rem 0;
+        color: #bdc3c7;
+      }
+
+      .modalT {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        justify-content: center;
+        align-items: center;
+      }
+
+      .modalT-content {
+        background: white;
+        color: black;
+        padding: 2rem;
+        border-radius: 10px;
+        max-width: 500px;
+        width: 50%;
+        text-align: center;
+        font-size: 20px;
+      }
+
+      .modalT-content h2 {
+        margin-bottom: 1rem;
+      }
+
+      .modalT-content button {
+        margin-top: 1rem;
+        padding: 0.5rem 1rem;
+        background: #ff6f61;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="d-flex main-con">
+      <div class="d-flex">
+        <div class="sidebar poppins" id="sidebar">
+          <div class="d-flex flex-column gap-2 w-100">
+            <img
+              id="sidebarProfilePicture"
+              src="https://via.placeholder.com/120"
+              alt="Profile Picture"
+              class="sidebar-profile-picture"
+            />
+            <h2 style="text-align: center">Paldo.com</h2>
+            <nav>
+              <ul>
+                <li class="rounded-pill" id="homeTab">Home</li>
+                <li class="rounded-pill" id="trendingTab">Trending</li>
+                <li class="rounded-pill" id="favoritesTab">Favorites</li>
+                <li class="rounded-pill" id="profileTab">Profile</li>
+                <li class="rounded-pill" id="settingsTab">Settings</li>
+              </ul>
+            </nav>
+          </div>
+
+          <button class="rounded-pill" id="logout">Logout</button>
+        </div>
+        <div
+          class="d-flex justify-content-center bg-dark align-items-center"
+          style="height: 100vh; width: 50px"
+        >
+          <i
+            id="icon"
+            onclick="toggleSidebar()"
+            class="icon bi bi-caret-left-fill fs-1 text-light"
+          ></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="content poppins bg-dark text-light" id="content"></div>
+
+    <script>
+      const toggleSidebar = () => {
+        const sidebar = document.getElementById("sidebar");
+        const toggleIcon = document.getElementById("icon");
+        sidebar.classList.toggle("collapsed");
+        toggleIcon.classList.toggle("collapsed");
+      };
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const contentDiv = document.getElementById("content");
+        const homeTab = document.getElementById("homeTab");
+        const trendingTab = document.getElementById("trendingTab");
+        const profileTab = document.getElementById("profileTab");
+        const settingsTab = document.getElementById("settingsTab");
+        const logoutButton = document.getElementById("logout");
+        const sidebarProfilePicture = document.getElementById(
+          "sidebarProfilePicture"
+        );
+
+        const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
+
+        const loadSidebarProfilePicture = () => {
+          if (loggedInUser && loggedInUser.profilePicture) {
+            sidebarProfilePicture.src = loggedInUser.profilePicture;
+          }
+        };
+
+        loadSidebarProfilePicture();
+
+        //Home ni
+        const loadHomeContent = () => {
+          contentDiv.innerHTML = `
+              <div
+        class="container d-flex flex-column align-items-center p-0 poppins"
+      >
+        <div class="mb-4" style="margin-top: 5vh;">
+          <h1 class="">Search a crypto</h1>
+        </div>
+        <div class="d-flex flex-column w-50 mb-4">
+          <input
+            type="text"
+            class="me-2 form-control form-control-lg border border-3 border-dark rounded-pill"
+            id="search"
+            placeholder="Enter token symbol"
+          />
+        </div>
+        <div class="mb-4">
+          <button class="btn btn-light px-5 py-3 rounded-pill" id="go">
+            Search
+          </button>
+        </div>
+      </div>
+
+      <div class="container p-5 text-center text-light" id="welcome">
+        <h1 class="size">Crypto Information?</h1>
+        <h1 class="size-2">I got you!</h1>
+      </div>
+
+     <!--RESULT-->
+     <div
+     class="container bg-gradient-to-bottom p-4 rounded-3 shadow-lg hide mb-5 bg-dark"
+     id="result"
+     
+   >
+     <div class="row g-4">
+       <!-- Left Section: Token Info -->
+       <div class="col-md-6">
+         <div class="card border-0 rounded-3 shadow-sm bg-white h-100">
+           <div class="card-body">
+             <h3 class="card-title text-dark mb-4 text-dark">
+               <i class="bi bi-coin me-2"></i>Token Details
+             </h3>
+             <ul class="list-unstyled">
+               <li class="mb-3">
+                 <strong>Token Name:</strong>
+                 <span id="name" class="text-dark fw-medium ms-2"></span>
+               </li>
+               <li class="mb-3">
+                 <strong>Token Symbol:</strong>
+                 <span id="symbol" class="text-dark fw-medium ms-2"></span>
+               </li>
+               <li class="mb-3">
+                 <strong>Current Price:</strong>
+                 <span id="price" class="text-success fw-medium ms-2"></span>
+               </li>
+               <li class="mb-3">
+                 <strong>Price Change (24hrs):</strong>
+                 <span id="price_change_percentage_24h" class="fw-medium ms-2"></span>
+               </li>
+               <li class="mb-3">
+                 <strong>Total Volume (24hrs):</strong>
+                 <span id="total_volume" class="text-dark fw-medium ms-2"></span>
+               </li>
+               <li class="mb-3">
+                 <strong>Market Cap:</strong>
+                 <span id="market-cap" class="text-dark fw-medium ms-2"></span>
+               </li>
+             </ul>
+           </div>
+         </div>
+       </div>
+   
+       <!-- Right Section: Statistics -->
+       <div class="col-md-6">
+         <div class="card border-0 rounded-3 shadow-sm bg-white h-100">
+           <div class="card-body">
+             <h3 class="card-title text-dark mb-4">
+               <i class="bi bi-bar-chart-fill me-2"></i>Market Statistics
+             </h3>
+             <ul class="list-unstyled text-dark">
+               <li class="mb-3">
+                 <strong>Circulating Supply:</strong>
+                 <span id="circulating_supply" class="text-dark fw-medium ms-2"></span>
+               </li>
+               <li class="mb-3">
+                 <strong>Total Supply:</strong>
+                 <span id="total_supply" class="text-dark fw-medium ms-2"></span>
+               </li>
+               <li class="mb-3">
+                 <strong>Max Supply:</strong>
+                 <span id="max_supply" class="text-dark fw-medium ms-2"></span>
+               </li>
+               <li class="mb-3">
+                 <strong>All-Time High:</strong>
+                 <span id="ath" class="text-success fw-medium ms-2"></span>
+               </li>
+               <li class="mb-3">
+                 <strong>All-Time High Date:</strong>
+                 <span id="ath_date" class="text-dark fw-medium ms-2"></span>
+               </li>
+               <li class="mb-3">
+                 <strong>All-Time Low:</strong>
+                 <span id="atl" class="text-danger fw-medium ms-2"></span>
+               </li>
+               <li class="mb-3">
+                 <strong>All-Time Low Date:</strong>
+                 <span id="atl_date" class="text-dark fw-medium ms-2"></span>
+               </li>
+             </ul>
+           </div>
+         </div>
+       </div>
+   
+       <!-- Full-Width Section: Description -->
+       <div class="col-12">
+         <div
+           class="card border-0 rounded-3 shadow-sm bg-white"
+           style="background: linear-gradient(to right, #ffffff, #f3f4f6);"
+         >
+           <div class="card-body">
+             <h3 class="card-title text-dark mb-4">
+               <i class="bi bi-file-text-fill me-2"></i>Token Description
+             </h3>
+             <p id="description" class="text-secondary"></p>
+           </div>
+         </div>
+       </div>
+     </div>
+   </div>
+   
+   
+     <!--RESULT-->
+    </div>
+
+    `;
+        };
+
+        //Profile ni
+        const loadProfileContent = () => {
+          const profilePictureSrc =
+            loggedInUser?.profilePicture || "https://via.placeholder.com/150";
+          contentDiv.innerHTML = `
+    <h2 class="text-light">Edit Profile Picture</h2>
+    <div class="profile-picture-container d-flex flex-column justify-content-center align-items-center">
+      <img id="profilePicturePreview" src="${profilePictureSrc}" alt="Profile Picture Preview" class="profile-picture" />
+    </div>
+    <div class="upload-section text-light">
+      <p>Click the profile to select new picture</p>
+      <input type="file" id="profilePictureInput" accept="image/*" class="upload-input d-none" />
+      <button id="updateProfilePicture" class="btn btn-light">Update Picture</button>
+    </div>
+  `;
+
+          const profilePicturePreview = document.getElementById(
+            "profilePicturePreview"
+          );
+          const profilePictureInput = document.getElementById(
+            "profilePictureInput"
+          );
+
+          profilePicturePreview.addEventListener("click", () => {
+            profilePictureInput.click();
+          });
+
+          handleProfilePictureUpdate();
+        };
+
+        const handleProfilePictureUpdate = () => {
+          const profilePictureInput = document.getElementById(
+            "profilePictureInput"
+          );
+          const profilePicturePreview = document.getElementById(
+            "profilePicturePreview"
+          );
+          const updateButton = document.getElementById("updateProfilePicture");
+
+          profilePictureInput.addEventListener("change", function () {
+            const file = this.files[0];
+            if (file) {
+              const reader = new FileReader();
+              reader.onload = function (event) {
+                profilePicturePreview.src = event.target.result;
+              };
+              reader.readAsDataURL(file);
+            }
+          });
+
+          updateButton.addEventListener("click", () => {
+            const file = profilePictureInput.files[0];
+            if (file) {
+              const reader = new FileReader();
+              reader.onload = () => {
+                const imageData = reader.result;
+                profilePicturePreview.src = imageData;
+                sidebarProfilePicture.src = imageData;
+
+                if (loggedInUser) {
+                  loggedInUser.profilePicture = imageData;
+                  localStorage.setItem(
+                    "loggedInUser",
+                    JSON.stringify(loggedInUser)
+                  );
+
+                  const users = JSON.parse(localStorage.getItem("users")) || [];
+                  const userIndex = users.findIndex(
+                    (user) => user.email === loggedInUser.email
+                  );
+                  if (userIndex !== -1) {
+                    users[userIndex].profilePicture = imageData;
+                    localStorage.setItem("users", JSON.stringify(users));
+                  }
+                }
+                alert("Profile picture updated successfully!");
+              };
+              reader.readAsDataURL(file);
+            } else {
+              alert("Please select an image.");
+            }
+          });
+        };
+
+        //Settings ni
+        const loadSettingsContent = () => {
+          contentDiv.innerHTML = `
+    <h2 class="text-light">Edit Account Details</h2>
+    <form id="settingsForm" class="settings-form text-light">
+      <div class="form-group">
+        <label for="settingsEmail">Email</label>
+        <input type="email" id="settingsEmail" value="${
+          loggedInUser?.email || ""
+        }" required />
+      </div>
+      <div class="form-group">
+        <label for="settingsPassword">Password</label>
+        <input type="password" id="settingsPassword" value="${
+          loggedInUser?.password || ""
+        }" required />
+      </div>
+      <button type="submit" class="btn btn-light">Save Changes</button>
+    </form>
+  `;
+
+          const settingsForm = document.getElementById("settingsForm");
+          const settingsEmail = document.getElementById("settingsEmail");
+          const settingsPassword = document.getElementById("settingsPassword");
+
+          settingsForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+
+            const updatedEmail = settingsEmail.value.trim();
+            const updatedPassword = settingsPassword.value.trim();
+
+            if (loggedInUser) {
+              loggedInUser.email = updatedEmail;
+              loggedInUser.password = updatedPassword;
+              localStorage.setItem(
+                "loggedInUser",
+                JSON.stringify(loggedInUser)
+              );
+
+              const users = JSON.parse(localStorage.getItem("users")) || [];
+              const userIndex = users.findIndex(
+                (user) => user.email === loggedInUser.email
+              );
+              if (userIndex !== -1) {
+                users[userIndex].email = updatedEmail;
+                users[userIndex].password = updatedPassword;
+                localStorage.setItem("users", JSON.stringify(users));
+              }
+            }
+
+            alert("Account details updated successfully!");
+          });
+        };
+
+        //Favorites tab ni
+        const loadTrendingContent = () => {
+          contentDiv.innerHTML = `
+                <h1>Trending<h1>
+                    <div class="containerT" id="cryptoContainer">
+
+    </div>
+
+     <div class="containerT" id="cryptoContainerT">
+      <!-- Crypto cardTs will be dynamically added here -->
+    </div>
+
+    <div class="modalT" id="cryptoModalT">
+      <div class="modalT-content" id="modalTContent">
+        <!-- ModalT content will be dynamically added here -->
+        <button onclick="closeModalT()">Close</button>
+      </div>
+    </div>
+            `;
+
+          //Trending Crypto js
+          let allCryptos = [];
+          let cryptoDetails = {};
+
+          async function fetchAllCryptos() {
+            try {
+              const responseList = await fetch(
+                "https://api.coingecko.com/api/v3/coins/list"
+              );
+              const dataList = await responseList.json();
+              allCryptos = dataList;
+
+              const responseDetails = await fetch(
+                "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=false"
+              );
+              const dataDetails = await responseDetails.json();
+              cryptoDetails = dataDetails.reduce((acc, crypto) => {
+                acc[crypto.id] = crypto;
+                return acc;
+              }, {});
+
+              displayCryptos(dataDetails);
+            } catch (error) {
+              console.error("Error fetching data:", error);
+            }
+          }
+
+          function displayCryptos(cryptos) {
+            const cryptoContainerT =
+              document.getElementById("cryptoContainerT");
+            cryptoContainerT.innerHTML = "";
+
+            for (const crypto of cryptos) {
+              const cryptoCardT = document.createElement("div");
+              cryptoCardT.classList.add("cardT");
+              cryptoCardT.innerHTML = `
+            <img src="${crypto.image}" alt="${crypto.name}">
+            <h2>${crypto.name}</h2>
+            <p>Symbol: ${crypto.symbol.toUpperCase()}</p>
+            <p>Price: $${crypto.current_price.toFixed(2)}</p>
+          `;
+
+              cryptoCardT.addEventListener("click", () => {
+                showCryptoDetails(crypto);
+              });
+
+              cryptoContainerT.appendChild(cryptoCardT);
+            }
+          }
+
+          function searchCrypto() {
+            const searchInput = document
+              .getElementById("searchInput")
+              .value.toLowerCase();
+            const filteredCryptos = allCryptos.filter(
+              (crypto) => crypto.symbol.toLowerCase() === searchInput
+            );
+
+            if (filteredCryptos.length > 0) {
+              const cryptoId = filteredCryptos[0].id;
+              const detailedCrypto = cryptoDetails[cryptoId];
+              if (detailedCrypto) {
+                displayCryptos([detailedCrypto]);
+              } else {
+                alert("No detailed data available for this coin.");
+              }
+            } else {
+              alert("No coin found with that symbol.");
+            }
+          }
+
+          function showCryptoDetails(crypto) {
+            const modalT = document.getElementById("cryptoModalT");
+            const modalTContent = document.getElementById("modalTContent");
+            modalTContent.innerHTML = `
+      <h2 >${crypto.name}</h2>
+      <img src="${crypto.image}" alt="${
+              crypto.name
+            }" style="width: 100px; height: 100px; margin-bottom: 1rem;">
+      <p>Symbol: ${crypto.symbol.toUpperCase()}</p>
+      <p>Current Price: $${crypto.current_price.toFixed(2)}</p>
+      <p>Market Cap: $${crypto.market_cap.toLocaleString()}</p>
+      <p>24h Change: ${crypto.price_change_percentage_24h.toFixed(2)}%</p>
+      <button id="closeButton">Close</button>
+    `;
+            modalT.style.display = "flex";
+
+            // Dynamically bind the event listener to the close button
+            const closeButton = document.getElementById("closeButton");
+            closeButton.addEventListener("click", closeModalT);
+          }
+
+          function closeModalT() {
+            const modalT = document.getElementById("cryptoModalT");
+            modalT.style.display = "none";
+          }
+
+          fetchAllCryptos();
+          //End of trending Crypto js
+        };
+
+        homeTab.addEventListener("click", loadHomeContent);
+        profileTab.addEventListener("click", loadProfileContent);
+        settingsTab.addEventListener("click", loadSettingsContent);
+        trendingTab.addEventListener("click", loadTrendingContent);
+
+        loadHomeContent();
+
+        logoutButton.addEventListener("click", () => {
+          localStorage.clear();
+          alert("Logged out successfully!");
+          location.href = "login.html";
+        });
+
+        //Search crypto js
+        const displayName = document.getElementById("name");
+        const displaySymbol = document.getElementById("symbol");
+        const displayPrice = document.getElementById("price");
+        const displayMarketCap = document.getElementById("market-cap");
+        const displayTotalVolume = document.getElementById("total_volume");
+        const displayPriceChangePercentage = document.getElementById(
+          "price_change_percentage_24h"
+        );
+        const displayCirculatingSupply =
+          document.getElementById("circulating_supply");
+        const displayTotalSupply = document.getElementById("total_supply");
+        const displayMaxSupply = document.getElementById("max_supply");
+        const displayATH = document.getElementById("ath");
+        const displayATL = document.getElementById("atl");
+        const displayATHDate = document.getElementById("ath_date");
+        const displayATLDate = document.getElementById("atl_date");
+        const displayDescription = document.getElementById("description");
+
+        function formatCurrency(num) {
+          const formatter = new Intl.NumberFormat("en-US", {
+            style: "currency",
+            currency: "PHP",
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          });
+          return formatter.format(num);
+        }
+
+        function formatDigits(num) {
+          return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        let coinsList = null;
+
+        const fetchCoinsList = async () => {
+          try {
+            if (!coinsList) {
+              const coinsListRes = await fetch(
+                "https://api.coingecko.com/api/v3/coins/list"
+              );
+              if (!coinsListRes.ok)
+                throw new Error("Failed to fetch coins list");
+              coinsList = await coinsListRes.json();
+            }
+          } catch (error) {
+            console.error(error.message);
+          }
+        };
+
+        const load = async (symbol) => {
+          try {
+            if (!coinsList) await fetchCoinsList();
+
+            const coin = coinsList.find(
+              (c) => c.symbol.toLowerCase() === symbol.toLowerCase()
+            );
+            if (!coin) {
+              throw new Error(`Coin with symbol "${symbol}" not found`);
+            }
+
+            const res = await fetch(
+              `https://api.coingecko.com/api/v3/coins/${coin.id}`
+            );
+            if (!res.ok) throw new Error("Failed to fetch coin data");
+            const data = await res.json();
+
+            const cryptoDetails = {
+              id: data.id,
+              symbol: data.symbol,
+              name: data.name,
+              market_cap_rank: data.market_cap_rank,
+              description: data.description.en,
+              current_price: data.market_data.current_price.php,
+              market_cap: data.market_data.market_cap.php,
+              total_volume: data.market_data.total_volume.php,
+              price_change_percentage_24h:
+                data.market_data.price_change_percentage_24h,
+              circulating_supply: data.market_data.circulating_supply,
+              total_supply: data.market_data.total_supply,
+              max_supply: data.market_data.max_supply,
+              ath: data.market_data.ath.php, // All-Time High in PHP
+              ath_date: data.market_data.ath_date.php, // Date of All-Time High in PHP
+              atl: data.market_data.atl.php, // All-Time Low in PHP
+              atl_date: data.market_data.atl_date.php,
+            };
+
+            document.getElementById("result").classList.remove("hide");
+            document.getElementById("welcome").classList.add("hide");
+
+            displayName.innerHTML = `${cryptoDetails.name}`;
+            displaySymbol.innerHTML = `${cryptoDetails.symbol.toUpperCase()}`;
+            displayPrice.innerHTML = `${formatCurrency(
+              parseFloat(cryptoDetails.current_price)
+            )}`;
+            displayMarketCap.innerHTML = `${formatCurrency(
+              parseFloat(cryptoDetails.market_cap)
+            )}`;
+
+            displayTotalVolume.innerHTML = `${formatDigits(
+              parseFloat(cryptoDetails.total_volume)
+            )}`;
+
+            const priceChange = parseFloat(
+              cryptoDetails.price_change_percentage_24h
+            );
+            if (priceChange >= 0) {
+              displayPriceChangePercentage.style.color = "green";
+              displayPriceChangePercentage.innerHTML = `+${priceChange.toFixed(
+                2
+              )}%`;
+            } else {
+              displayPriceChangePercentage.style.color = "red";
+              displayPriceChangePercentage.innerHTML = `${priceChange.toFixed(
+                2
+              )}%`;
+            }
+
+            displayCirculatingSupply.innerHTML = `${formatDigits(
+              parseFloat(cryptoDetails.circulating_supply)
+            )}`;
+            displayTotalSupply.innerHTML = `${formatDigits(
+              parseFloat(cryptoDetails.total_supply)
+            )}`;
+
+            const maxSupply = parseFloat(cryptoDetails.max_supply);
+
+            if (!isNaN(maxSupply)) {
+              displayMaxSupply.innerHTML = `${formatDigits(maxSupply)}`;
+            } else {
+              displayMaxSupply.innerHTML = "∞";
+            }
+
+            displayATH.innerHTML = `${formatCurrency(cryptoDetails.ath)}`;
+            displayATL.innerHTML = `${formatCurrency(cryptoDetails.atl)}`;
+
+            let athDate = new Date(cryptoDetails.ath_date);
+            let atlDate = new Date(cryptoDetails.atl_date);
+
+            const fathDate = athDate.toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            });
+
+            const fatlDate = atlDate.toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            });
+
+            displayATHDate.innerHTML = `${fathDate}`;
+            displayATLDate.innerHTML = `${fatlDate}`;
+
+            displayDescription.innerHTML = `${cryptoDetails.description}`;
+          } catch (error) {
+            console.error(error.message);
+          }
+        };
+
+        document.getElementById("go").addEventListener("click", (e) => {
+          const crypto = document.getElementById("search").value.toLowerCase();
+          load(crypto);
+          document.getElementById("search").value = "";
+        });
+
+        fetchCoinsList();
+
+        //End of Search Crypto js
+      });
+    </script>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>

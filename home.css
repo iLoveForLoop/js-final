@@ -1,0 +1,169 @@
+body {
+    display: flex;
+    height: 100vh;
+    margin: 0;
+    font-family: "Poppins", sans-serif;
+  }
+  
+  .theme-color {
+    color: #2f2f2f !important;
+  }
+  
+  .sidebar {
+    background-color: #ffffff;
+    color: white;
+    width: 250px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+    transition: width 0.3s ease;
+  }
+  
+  .sidebar.collapsed {
+    width: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+  
+  .sidebar-profile-picture {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 0 auto 20px;
+    border: 3px solid white;
+    transition: opacity 0.3s ease;
+  }
+  
+  .sidebar.collapsed .sidebar-profile-picture {
+    opacity: 0;
+  }
+  
+  nav ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  nav ul li {
+    margin: 15px 0;
+    padding: 10px;
+    cursor: pointer;
+    text-align: center;
+    background-color: #ffffff;
+    color: #333;
+    border-radius: 5px;
+    border: 2.5px rgba(6, 6, 6, 0.8) solid;
+    transition: background-color 0.3s;
+  }
+  
+  nav ul li:hover {
+    background-color: #141414;
+    color: aliceblue;
+  }
+  
+  button {
+    background-color: #fafafa;
+    color: rgb(44, 44, 44);
+    padding: 10px;
+    border: 2.5px rgba(6, 6, 6, 0.8) solid;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 20px;
+    transition: .3s ease-in-out;
+  }
+  
+  button:hover {
+    background-color: #c0392b;
+    color: rgb(213, 213, 213);
+  }
+  
+  .content {
+    flex-grow: 1;
+    width: auto;
+    padding: 30px;
+    overflow-y: auto;
+  }
+  
+  h2 {
+    color: #333;
+  }
+  
+  .profile-picture-container {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .profile-picture {
+    width: 300px;
+    height: 300px;
+    /* border-radius: 50%; */
+    object-fit: cover;
+    border: 3px solid #ccc;
+  }
+  
+  .upload-section {
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  .upload-input {
+    margin: 10px 0;
+  }
+  
+  /* .btn {
+    padding: 10px 20px;
+    background-color: #646464;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: ease-in-out 0.3s;
+  }
+  
+  .btn:hover {
+    color: white !important;
+  } */
+  
+  iframe {
+    width: 100%;
+    height: 600px;
+    border: none;
+  }
+  
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+  }
+  
+  .form-group input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .main-con {
+    position: relative;
+    width: auto;
+  }
+  
+  .icon {
+    cursor: pointer;
+    transition: transform 0.5s ease;
+  }
+  
+  .icon.collapsed {
+    transform: rotate(180deg);
+  }
+  
+  .poppins {
+    font-family: "Poppins", serif;
+    font-weight: 400;
+    font-style: normal !important;
+  }
